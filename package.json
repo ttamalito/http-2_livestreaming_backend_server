@@ -1,0 +1,24 @@
+{
+  "name": "http-2_livestreaming_backend_server",
+  "version": "1.0.0",
+  "description": "Backend server for hosting a livestreaming server with http/2 using Node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ttamalito/http-2_livestreaming_backend_server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ttamalito/http-2_livestreaming_backend_server/issues"
+  },
+  "homepage": "https://github.com/ttamalito/http-2_livestreaming_backend_server#readme",
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
