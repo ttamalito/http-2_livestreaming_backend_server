@@ -24,4 +24,6 @@ class BaseRoute extends AbstractRoute {
 
 // instantiate the route and export it
 const baseRoute = new BaseRoute(httpMethods.GET, '/', false);
-module.exports = baseRoute;
+// add it to the routes array
+routes.push(baseRoute);
+

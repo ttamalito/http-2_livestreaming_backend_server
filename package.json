@@ -20,5 +20,8 @@
   "homepage": "https://github.com/ttamalito/http-2_livestreaming_backend_server#readme",
   "devDependencies": {
     "nodemon": "^3.0.3"
+  },
+  "dependencies": {
+    "require-dir": "^1.2.0"
   }
 }

@@ -2,6 +2,9 @@ const http2 = require('node:http2');
 const fs = require('node:fs');
 const path = require('node:path');
 const routes = require('./routes/routes');
+const requireDir = require('require-dir')
+// require all the base routes
+const baseRoutes = requireDir('./routes/baseRoutes');
 
 // function to process every single request
 const processRequest = require('./utils/processRequest');
