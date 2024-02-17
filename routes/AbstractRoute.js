@@ -1,3 +1,5 @@
+const Headers = require('../utils/Headers')
+
 /**
  * Abstract class to represent a Route
  * The constructor takes three arguments
@@ -44,8 +46,9 @@ class AbstractRoute {
      * @param {Http2ServerRequest} req
      * @param {Http2ServerResponse} res
      * @param {Http2Stream} stream
+     * @param {Headers} headers
      */
-    controller(req, res, stream) {
+    controller(req, res, stream, headers) {
         throw new Error(`Abstract method should be implemented`);
     }
 

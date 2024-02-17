@@ -9,6 +9,9 @@ const baseRoutes = requireDir('./routes/baseRoutes');
 // function to process every single request
 const processRequest = require('./utils/processRequest');
 
+// headers
+const initializeHeaders = require('./utils/initializeHeaders');
+
 const server = http2.createSecureServer({
     key: fs.readFileSync("/Users/jjgon/Documents/https_certs/key.pem"),
     cert: fs.readFileSync("/Users/jjgon/Documents/https_certs/cert.pem")
@@ -32,6 +35,7 @@ server.on('connection', socket => {
 
 server.on('request', (req, res) => {
     console.log(routes);
+    const headers = initializeHeaders();
     // on each request, process the request
     processRequest(req, res, req.stream);
 })

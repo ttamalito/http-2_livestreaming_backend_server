@@ -8,17 +8,16 @@ class BaseRoute extends AbstractRoute {
     }
 
     // define the controller
-    controller(req, res, stream) {
-        stream.respond({
-            'content-type': 'text/html; charset=utf-8',
-            ':status': 200,
-            'access-control-allow-origin': 'https://localhost:8080',
-            'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS'
+    controller(req, res, stream, headers) {
+        // append all the necessary headers
+        headers.appendContentType('text/html; charset=utf-8');
+        headers.setStatus(200);
 
-        })
+        // respond
+        stream.respond(headers.getHeaders());
         console.log(`The stream sent headers:`);
         console.log(stream.sentHeaders)
-        stream.end('<h1> Hello World! <h1/>', () => {console.log(`Stream finisheeeedddd`)});
+        stream.end('<h1> Hello World! <h1/>', () => {console.log(`Stream finished`)});
     }
 }
 
