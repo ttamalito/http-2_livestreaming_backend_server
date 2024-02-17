@@ -15,9 +15,7 @@ class BaseRoute extends AbstractRoute {
 
         // respond
         stream.respond(headers.getHeaders());
-        console.log(`The stream sent headers:`);
-        console.log(stream.sentHeaders)
-        stream.end('<h1> Hello World! <h1/>', () => {console.log(`Stream finished`)});
+        stream.end('<h1> Hello World! <h1/>', () => {console.log(`Stream ${stream.id} finished`)});
     }
 }
 
