@@ -2,6 +2,7 @@ const AbstractRoute = require('../AbstractRoute')
 const separatePath = require('../../utils/separetePath');
 const routes = require('../routes');
 const fs = require('node:fs');
+const liveMap = require('../../utils/LiveUsersMap')
 /**
  * Route to fetch the livestream of a given user by the url
  */
@@ -20,7 +21,7 @@ class GetLiveRoute extends AbstractRoute {
         const separatedPath = separatePath(path);
         // check that the length is 2
         if (separatedPath.length !== 2) {
-            // its different path, should be /user/live,
+            // its different path, should be /user/live/index,
             return false;
         }
 
@@ -44,27 +45,64 @@ class GetLiveRoute extends AbstractRoute {
         stream.respond(headers.getHeaders());
         // get the username, so that we can store the livestream
         const username = separatePath(req.url)[0];
+        // check if the user has a stream
+        let index = 0;
+        let filename; // modify this to
+        if (liveMap.hasFiles(username)) { // liveMap.hasFiles(username)
+            filename = liveMap.getFileAtIndex(username, index);
+        } else {
+            // there is no stream for this user, so close the stream
+            stream.end(()=> {console.log(`Stream ended because there is no livestream for that user`)})
+            return;
+        }
         // create a readable stream
-        const readableStream = fs.createReadStream(`./liveVideoStreams/${username}.webm`, {
-            highWaterMark: 16*1024
-        })
-        // set the event listener
-        readableStream.on('data', chunk => {
-            // write the read data to the stream
-            stream.write(chunk);
-        });
 
-        // add event to finish the stream
-        readableStream.on('end', () => {
-            // close the stream
-            stream.end(() => {console.log(`The stream has been closed, all the data was sent`)});
-        })
-        //stream.respondWithFile(`./liveVideoStreams/${username}.webm`, headers.getHeaders(), {length: 20000000}); // read 20 mill bytes
-    }
+
+        // read all the files
+        readFile(stream, username, index);
+    } // end of controller
 
 
 } // end of class GETLiveRoute
 
-const getLiveRoute = new GetLiveRoute('GET', '/:user/live', true);
+const getLiveRoute = new GetLiveRoute('GET', '/:user/live/:index', true);
 // add it to the array
 routes.push(getLiveRoute);
+
+/**
+ * Reads a bunc of files recursively
+ * @param stream
+ * @param username
+ * @param index
+ */
+function readFile(stream, username, index) {
+    console.log(`We are reading a file with index : ${index}`);
+    console.log(`For stream ${stream.id}`)
+    // check if there are more files
+    if (liveMap.getLengthOfFiles(username) <= index) {
+        // end the stream
+        stream.end(() => {
+            console.log(`Recursive Stream: ${stream.id} ended`);
+        })
+        return;
+    }
+
+    const filename = liveMap.getFileAtIndex(username, index);
+    const readableStream = fs.createReadStream(`./liveVideoStreams/${username}/${filename}`, {
+        highWaterMark: 16*1024
+    })
+    // set the event listener
+    readableStream.on('data', chunk => {
+        stream.write(chunk);
+    });
+
+    // add event to finish the stream
+    readableStream.on('end', () => {
+        // call this function again
+        console.log(`The readeable stream just ended, we should start a new one`)
+        setTimeout(() => {
+            // wait for 2 seconds before reading the next file
+            readFile(stream, username, index + 1);
+        }, 2000);
+    })
+} // end of function

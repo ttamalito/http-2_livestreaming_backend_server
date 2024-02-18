@@ -2,6 +2,8 @@ const AbstractRoute = require('../AbstractRoute')
 const separatePath = require('../../utils/separetePath');
 const routes = require('../routes');
 const fs = require('node:fs');
+const liveMap = require('../../utils/LiveUsersMap');
+
 /**
  * Route to start the livestreaming, (the creator should visit this page)
  */
@@ -33,7 +35,7 @@ class LiveRoute extends AbstractRoute {
         return false;
     } // end of match
 
-    controller(req, res, stream, headers) {
+    async controller(req, res, stream, headers) {
         // get the content length
         let contentLength;
         try {
@@ -48,25 +50,41 @@ class LiveRoute extends AbstractRoute {
         }
         // get the username, so that we can store the livestream
         const username = separatePath(req.url)[0];
+        // check if there is a fileDescriptor for the user already
+        let index;
+        let fileToOpen = `./liveVideoStreams/${username}/`;
+        // the filename to be saved
+        let filename;
+        if (liveMap.hasFiles(username)) {
+            // it has some files, get the amount of files
+            index = liveMap.getLengthOfFiles(username);
+            filename = `${username}_file_${index}.webm`
+            fileToOpen = fileToOpen + filename;
+
+        } else {
+            index = 0;
+            // there are no files
+            filename = `${username}_file_${index}.webm`
+            fileToOpen = fileToOpen + filename;
+            liveMap.addLiveUser(username); // add it to the map, with an empty array
+        }
         let bytesReceived = 0; // amount of bytes from the payload that were received so far
         // add an event handler to the stream, to receive data
         stream.on('data', chunk => {
-            console.log(`We recieved some data on stream ${stream.id}`);
-           // console.log(chunk.toString());
-            console.log(`Of size: ${chunk.length}`);
+
+            // append the file
+            fs.appendFileSync(fileToOpen, chunk); // append
             // add this to the bytes received
             bytesReceived += chunk.length;
-            // append the file
-            fs.appendFileSync(`./liveVideoStreams/${username}.webm`, chunk);
             // check if that is all the content that we need to receive
             if (contentLength === bytesReceived) {
+                // we read everything that was send, add it to the files
+                liveMap.appendFilename(username, filename);
                 // end the stream
-                console.log(`The highwater mark is: ${stream.readableHighWaterMark}`)
-                console.log(`The state of the stream`);
-                console.log(stream.state)
                 stream.end(() => {console.log(`Stream ${stream.id} received all the ${bytesReceived} bytes, so it was closed`)});
             }
-        })
+
+        }) // end of data
 
         // allow the content type headers
         headers.append('access-control-allow-headers', 'content-type');
