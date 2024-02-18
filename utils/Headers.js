@@ -55,6 +55,15 @@ class Headers {
         this.append('access-control-allow-origin', origin);
         this.append('access-control-allow-methods', methods);
     }
+
+    /**
+     * Appends the content length header to the headers object
+     * @param {number} length
+     */
+    appendContentLength(length) {
+        this.append('content-length', length.toString())
+    }
+
 } // end of class
 
 module.exports = Headers;

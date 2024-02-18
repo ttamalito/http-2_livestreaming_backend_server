@@ -44,7 +44,7 @@ class LiveRoute extends AbstractRoute {
                 ':status': 411 // length required
             }, {endStream: true});
             // end the stream
-            stream.close(() => {console.log(`Stream was closed with 411 status code response`)});
+            stream.end(() => {console.log(`Stream was closed with 411 status code response`)});
         }
         // get the username, so that we can store the livestream
         const username = separatePath(req.url)[0];
