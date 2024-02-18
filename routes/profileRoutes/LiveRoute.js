@@ -1,6 +1,7 @@
 const AbstractRoute = require('../AbstractRoute')
 const separatePath = require('../../utils/separetePath');
 const routes = require('../routes');
+const fs = require('node:fs');
 /**
  * Route to start the livestreaming, (the creator should visit this page)
  */
@@ -45,21 +46,25 @@ class LiveRoute extends AbstractRoute {
             // end the stream
             stream.close(() => {console.log(`Stream was closed with 411 status code response`)});
         }
+        // get the username, so that we can store the livestream
+        const username = separatePath(req.url)[0];
         let bytesReceived = 0; // amount of bytes from the payload that were received so far
         // add an event handler to the stream, to receive data
         stream.on('data', chunk => {
-            //console.log(`We recieved some data on stream ${stream.id}`);
+            console.log(`We recieved some data on stream ${stream.id}`);
            // console.log(chunk.toString());
-            //console.log(`Of size: ${chunk.length}`);
+            console.log(`Of size: ${chunk.length}`);
             // add this to the bytes received
             bytesReceived += chunk.length;
+            // append the file
+            fs.appendFileSync(`./liveVideoStreams/${username}.webm`, chunk);
             // check if that is all the content that we need to receive
             if (contentLength === bytesReceived) {
                 // end the stream
                 console.log(`The highwater mark is: ${stream.readableHighWaterMark}`)
                 console.log(`The state of the stream`);
                 console.log(stream.state)
-                stream.end(() => {console.log(`Stream ${stream.id} received all the bytes, so it was closed`)});
+                stream.end(() => {console.log(`Stream ${stream.id} received all the ${bytesReceived} bytes, so it was closed`)});
             }
         })
 

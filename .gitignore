@@ -1,6 +1,9 @@
 #security
 certificate/
 
+#all the video streams
+liveVideoStreams/
+
 
 # Logs
 logs
