@@ -19,7 +19,10 @@ async function connectToDataBase() {
 
 }
 
-
+/**
+ * Returns the database instance
+ * @returns {*}
+ */
 function getDb() {
     if (!db) {
         // there is no database
