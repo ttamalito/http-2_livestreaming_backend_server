@@ -10,6 +10,9 @@ const profileRoutes = requireDir('./routes/profileRoutes');
 // function to process every single request
 const processRequest = require('./utils/processRequest');
 
+const {connectToDataBase, getDb} = require('./utils/database');
+
+
 // headers
 const initializeHeaders = require('./utils/initializeHeaders');
 
@@ -48,4 +51,8 @@ server.on('request', (req, res) => {
     processRequest(req, res, req.stream, headers);
 })
 
-server.listen(8443, () => {console.log(`HTTP/2 server up an running in port 8443`)});
+// start listening after connecting to the database
+connectToDataBase().then(() => {
+    server.listen(8443, () => {console.log(`Server up and running on Port 8443`)})
+})
+
