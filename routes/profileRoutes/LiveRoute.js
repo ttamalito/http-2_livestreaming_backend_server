@@ -68,6 +68,13 @@ class LiveRoute extends AbstractRoute {
             fileToOpen = fileToOpen + filename;
             liveMap.addLiveUser(username); // add it to the map, with an empty array
         }
+        // check if there is a directory for the stream for that user
+        if (!fs.existsSync(`./liveVideoStreams/${username}`)) {
+            // there is no directory for that user
+            // create the new directory
+            fs.mkdirSync(`./liveVideoStreams/${username}`);
+        }
+        // continue wwith the requesst
         let bytesReceived = 0; // amount of bytes from the payload that were received so far
         // add an event handler to the stream, to receive data
         stream.on('data', chunk => {
